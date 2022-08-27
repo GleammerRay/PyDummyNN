@@ -6,17 +6,19 @@ class Neurone:
     def __init__(self, connections : dict | NoneType = None, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
         self._connections = connections if (connections is dict) else {}
         self.onFire = None
-        self._value = value if (value is float) else 0.0
+        self._value = 0.0 if (value is None) else value
         self._initValue = self._value
-        self._minValue = minValue if (minValue is float) else 0.0
-        self._maxValue = maxValue if (maxValue is float) else 1.0
+        self._minValue = 0.0 if (minValue is None) else minValue
+        self._maxValue = 1.0 if (maxValue is None) else maxValue
 
     @staticmethod
-    def fromJSON(json : list, neurones : list):
+    def fromJSON(json : list, neurones : list | NoneType = None):
+        _jsonConnections = json['connections']
         connections = {}
-        for i in range(0, len(json)):
-            connections[neurones[i]] = json[i]
-        return Neurone(connections)
+        if neurones is not None:
+            for i in range(0, len(json)):
+                connections[neurones[i]] = _jsonConnections[i]
+        return Neurone(connections, json['initValue'], json['minValue'], json['maxValue'])
 
     def toString(self) -> str:
         result = ''
@@ -30,10 +32,13 @@ class Neurone:
         result
         return result
 
-    def toJSON(self) -> list:
-        json = []
-        for k, v in self._connections.items():
-            json.append(v)
+    def toJSON(self) -> dict:
+        json = {
+            'connections': None if (len(self._connections) == 0) else list(self._connections.values()),
+            'initValue': self._initValue,
+            'minValue': self._minValue,
+            'maxValue': self._maxValue
+        }
         return json
 
     def resetValue(self):
