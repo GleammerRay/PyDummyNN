@@ -3,10 +3,13 @@ from random import randint, uniform
 from types import NoneType
 
 class Neurone:
-    def __init__(self, connections : dict | NoneType = None):
+    def __init__(self, connections : dict | NoneType = None, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
         self._connections = connections if (connections is dict) else {}
         self.onFire = None
-        self._value = 0
+        self._value = value if (value is float) else 0.0
+        self._initValue = self._value
+        self._minValue = minValue if (minValue is float) else 0.0
+        self._maxValue = maxValue if (maxValue is float) else 1.0
 
     @staticmethod
     def fromJSON(json : list, neurones : list):
@@ -34,16 +37,16 @@ class Neurone:
         return json
 
     def resetValue(self):
-        self._value = 0.0
+        self._value = self._initValue
         
     def randomBias(self, maxBias : float):
         for k, v in self._connections.items():
             posi = -1 if randint(0, 1) == 0 else 1
             v = v + (uniform(0.0, maxBias) * posi)
-            if (v < 0):
-                v = 0
-            if (v > 1):
-                v = 1
+            if (v < self._minValue):
+                v = self._minValue
+            if (v > self._maxValue):
+                v = self._maxValue
             self._connections[k] = v
     
     def connect(self, neurone, value):
@@ -57,27 +60,27 @@ class Neurone:
     
     def pulse(self, value):
         self._value += value
-        if (self._value < 0.0):
-            self._value = 0.0
-        if (self._value >= 1.0):            
-            self._value = 0.0
+        if (self._value < self._minValue):
+            self._value = self._minValue
+        if (self._value >= self._maxValue):            
+            self._value = self._initValue
             self.fire()
 
 class Algo:
-    def __init__(self, inputCount : int, hiddenCount : int, outputCount : int):        
+    def __init__(self, inputCount : int, hiddenCount : int, outputCount : int, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
         self._outputs = []
         for i in range(0, outputCount):
-            neurone = Neurone()
+            neurone = Neurone(None, value, minValue, maxValue)
             self._outputs.append(neurone)
         self._hidden = []
         for i in range(0, hiddenCount):
-            neurone = Neurone()
+            neurone = Neurone(None, value, minValue, maxValue)
             for i2 in range(0, len(self._outputs)):
                 neurone.connect(self._outputs[i2], 0.5)
             self._hidden.append(neurone)
         self._inputs = []
         for i in range(0, inputCount):
-            neurone = Neurone()
+            neurone = Neurone(None, value, minValue, maxValue)
             for i2 in range(0, hiddenCount):
                 neurone.connect(self._hidden[i2], 0.5)
             self._inputs.append(neurone)
