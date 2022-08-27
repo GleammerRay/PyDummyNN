@@ -4,7 +4,7 @@ from types import NoneType
 
 class Neurone:
     def __init__(self, connections : dict | NoneType = None, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
-        self._connections = connections if (connections is dict) else {}
+        self._connections = {} if (connections is None) else connections
         self.onFire = None
         self._value = 0.0 if (value is None) else value
         self._initValue = self._value
@@ -12,12 +12,12 @@ class Neurone:
         self._maxValue = 1.0 if (maxValue is None) else maxValue
 
     @staticmethod
-    def fromJSON(json : list, neurones : list | NoneType = None):
+    def fromJSON(json : dict, connectedNeurones : list | NoneType = None):
         _jsonConnections = json['connections']
         connections = {}
-        if neurones is not None:
-            for i in range(0, len(json)):
-                connections[neurones[i]] = _jsonConnections[i]
+        if connectedNeurones is not None:
+            for i in range(0, len(connectedNeurones)):
+                connections[connectedNeurones[i]] = _jsonConnections[i]
         return Neurone(connections, json['initValue'], json['minValue'], json['maxValue'])
 
     def toString(self) -> str:
@@ -108,12 +108,27 @@ class Algo:
             result += '\n' + neurone.toString()
         return result
 
+    @staticmethod
+    def fromJSON(json : dict):
+        _outputs = []
+        for _output in json['outputs']:
+            _outputs.append(Neurone.fromJSON(_output))
+        _hiddenList = []
+        for _hidden in json['hidden']:
+            _hiddenList.append(Neurone.fromJSON(_hidden, _outputs))
+        _inputs = []
+        for _input in json['inputs']:
+            _inputs.append(Neurone.fromJSON(_input, _hiddenList))
+        return Algo(_inputs, _hiddenList, _outputs)
+
     def toJSON(self) -> dict:
-        json = { 'inputs': [], 'hidden': [] }
+        json = { 'inputs': [], 'hidden': [], 'outputs': [] }
         for neurone in self._inputs:
             json['inputs'].append(neurone.toJSON())
         for neurone in self._hidden:
             json['hidden'].append(neurone.toJSON())
+        for neurone in self._outputs:
+            json['outputs'].append(neurone.toJSON())
         return json
 
     def randomBias(self, maxBias : float):

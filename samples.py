@@ -37,6 +37,7 @@ def sampleOnly1s(hiddenCount : int = 5, iterationCount : int = 20, maxBias : flo
     print('Results:')
     print('Score: ' + str(score))
     print('% of 1s: ' + str(num / len(result) * 100) + '%')
+    algo.resetNeuroneValues()
     return algo
 
 def sample1sAnd0s(hiddenCount : int = 10, iterationCount : int = 20, maxBias : float = 0.5, generationCount : int = 10000):
@@ -103,4 +104,5 @@ def sample1sAnd0s(hiddenCount : int = 10, iterationCount : int = 20, maxBias : f
     print('Results:')
     print('% of 0s: ' + str((num0 / len(result0)) * 100) + '%')
     print('% of 1s: ' + str((num1 / len(result1)) * 100) + '%')
+    algo.resetNeuroneValues()
     return algo
