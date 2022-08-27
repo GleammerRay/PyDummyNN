@@ -115,6 +115,20 @@ class Algo:
         for neurone in self._outputs:
             neurone.resetValue()
 
+    def pulse(self, inputs : dict, iterationCount : int) -> list:
+        _results = []
+        for i in range(0, len(self._outputs)):
+            def _loop():
+                a = i
+                def _appendResult():
+                    _results.append(a)
+                self._outputs[i].onFire = _appendResult
+            _loop()
+        for i in range(0, iterationCount):
+            for k, v in inputs.items():
+                self._inputs[k].pulse(v)
+        return _results
+
     def fire(self, inputs : list, iterationCount : int) -> list:
         _results = []
         for i in range(0, len(self._outputs)):
