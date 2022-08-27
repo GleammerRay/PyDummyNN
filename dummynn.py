@@ -67,23 +67,30 @@ class Neurone:
             self.fire()
 
 class Algo:
-    def __init__(self, inputCount : int, hiddenCount : int, outputCount : int, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
-        self._outputs = []
+    def __init__(self, inputs : list, hidden : list, outputs : list):
+        self._inputs = inputs
+        self._hidden = hidden
+        self._outputs = outputs
+
+    @staticmethod
+    def empty(inputCount : int, hiddenCount : int, outputCount : int, value : float | NoneType = None, minValue : float | NoneType = None, maxValue : float | NoneType = None):
+        _outputs = []
         for i in range(0, outputCount):
             neurone = Neurone(None, value, minValue, maxValue)
-            self._outputs.append(neurone)
-        self._hidden = []
+            _outputs.append(neurone)
+        _hidden = []
         for i in range(0, hiddenCount):
             neurone = Neurone(None, value, minValue, maxValue)
-            for i2 in range(0, len(self._outputs)):
-                neurone.connect(self._outputs[i2], 0.5)
-            self._hidden.append(neurone)
-        self._inputs = []
+            for i2 in range(0, len(_outputs)):
+                neurone.connect(_outputs[i2], 0.5)
+            _hidden.append(neurone)
+        _inputs = []
         for i in range(0, inputCount):
             neurone = Neurone(None, value, minValue, maxValue)
             for i2 in range(0, hiddenCount):
-                neurone.connect(self._hidden[i2], 0.5)
-            self._inputs.append(neurone)
+                neurone.connect(_hidden[i2], 0.5)
+            _inputs.append(neurone)
+        return Algo(_inputs, _hidden, _outputs)
 
     def toString(self) -> str:
         result = '[inputs]'        
