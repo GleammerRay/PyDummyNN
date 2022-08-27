@@ -1,6 +1,5 @@
-from copy import copy, deepcopy
-from json import JSONEncoder
-from random import randint, random, uniform
+from copy import deepcopy
+from random import randint, uniform
 from types import NoneType
 
 class Neurone:
