@@ -1,1 +1,1 @@
-from dummynn import *
+from .dummynn import *
